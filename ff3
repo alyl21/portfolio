@@ -1,0 +1,22 @@
+# Import necessary libraries
+import numpy as np
+import pandas as pd
+
+# Load data into a pandas DataFrame
+df = pd.read_csv('data.csv')
+
+# Calculate Fama and French factors
+df['market_return'] = df['market_return'].mean()
+df['small_minus_big'] = df['small_firm_return'] - df['big_firm_return']
+df['value_minus_growth'] = df['value_stock_return'] - df['growth_stock_return']
+
+# Regress stock returns on Fama and French factors
+X = df[['market_return', 'small_minus_big', 'value_minus_growth']]
+y = df['stock_return']
+
+# Fit the model using OLS
+model = sm.OLS(y, X)
+results = model.fit()
+
+# Print the summary statistics
+print(results.summary())

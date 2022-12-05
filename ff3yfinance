@@ -1,0 +1,25 @@
+# Import necessary libraries
+import pandas as pd
+from pandas_datareader import data as pdr
+import yfinance as yf
+
+# Set up Yahoo! Finance API
+yf.pdr_override()
+
+# Function to retrieve stock data
+def get_stock_data(ticker, start_date, end_date):
+    df = pdr.get_data_yahoo(ticker, start=start_date, end=end_date)
+    return df
+
+# Function to calculate the fama and french 3 factor model
+def fama_french_3factor(df):
+    # Calculate market excess return
+    df['Market'] = df['Adj Close'].pct_change()
+    df['Market_Excess'] = df['Market'] - 0.025/252
+    # Calculate size factor
+    df['SMB'] = df['Adj Close'] - df['Adj Close'].rolling(window=30).mean()
+    df['SMB'] = df['SMB'] / df['Adj Close'].rolling(window=30).std()
+    # Calculate value factor
+    df['HML'] = df['Adj Close'] - df['Adj Close'].rolling(window=30).mean()
+    df['HML'] = df['HML'] / df['Adj Close'].rolling(window=30).std()
+    # Calculate alpha

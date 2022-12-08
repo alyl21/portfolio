@@ -1,0 +1,24 @@
+import statsmodels.api as sm
+
+def fama_french_5factor(df):
+    # Calculate market excess return
+    df['Market'] = df['Adj Close'].pct_change()
+    df['Market_Excess'] = df['Market'] - 0.025/252
+    # Calculate size factor
+    df['SMB'] = df['Adj Close'] - df['Adj Close'].rolling(window=30).mean()
+    df['SMB'] = df['SMB'] / df['Adj Close'].rolling(window=30).std()
+    # Calculate value factor
+    df['HML'] = df['Adj Close'] - df['Adj Close'].rolling(window=30).mean()
+    df['HML'] = df['HML'] / df['Adj Close'].rolling(window=30).std()
+    # Calculate profitability factor
+    df['Operating_Profit'] = df['Operating Profit'] / df['Total Revenue']
+    df['Profitability'] = df['Operating_Profit'] - df['Operating_Profit'].rolling(window=30).mean()
+    df['Profitability'] = df['Profitability'] / df['Operating_Profit'].rolling(window=30).std()
+    # Calculate investment factor
+    df['Capital_Expenditure'] = df['Capital Expenditure'] / df['Total Assets']
+    df['Investment'] = df['Capital_Expenditure'] - df['Capital_Expenditure'].rolling(window=30).mean()
+    df['Investment'] = df['Investment'] / df['Capital_Expenditure'].rolling(window=30).std()
+    # Calculate alpha
+    y = df['Adj Close']
+    X = df[['Market_Excess', 'SMB', 'HML', 'Profitability', 'Investment']]
+    model = sm.OLS(y, X).fit()
